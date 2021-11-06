@@ -1,28 +1,31 @@
 import { Test } from '@nestjs/testing';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { UpdateUserDto } from '../dto/update-user.dto';
-import { User } from '../schemas/user.schema';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './schemas/user.schema';
+import { userStub } from './test/stubs/user.stub';
+import { UserModel } from './test/support/user.model';
+import { UsersController } from './users.controller';
+import { UsersRepository } from './users.repository';
+import { UsersService } from './users.service';
 
-import { UsersController } from '../users.controller';
-import { UsersService } from '../users.service';
-import { userStub } from './stubs/user.stub';
+jest.mock('../users/users.service.ts');
 
-jest.mock('../users.service');
-
-xdescribe('UsersController', () => {
+describe(UsersController.name, () => {
   let usersController: UsersController;
   let usersService: UsersService;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [],
       controllers: [UsersController],
-      providers: [UsersService],
+      providers: [UsersService, UsersRepository, UserModel],
     }).compile();
 
     usersController = moduleRef.get<UsersController>(UsersController);
     usersService = moduleRef.get<UsersService>(UsersService);
     jest.clearAllMocks();
+  });
+  it('exists', () => {
+    expect(UsersController).toBeDefined();
   });
 
   describe('getUser', () => {
@@ -33,11 +36,11 @@ xdescribe('UsersController', () => {
         user = await usersController.getUser(userStub().userId);
       });
 
-      test('then it should call usersService', () => {
+      it('then it should call userService', () => {
         expect(usersService.getUserById).toBeCalledWith(userStub().userId);
       });
 
-      test('then is should return a user', () => {
+      it('then it should return a user', () => {
         expect(user).toEqual(userStub());
       });
     });
@@ -51,16 +54,15 @@ xdescribe('UsersController', () => {
         users = await usersController.getUsers();
       });
 
-      test('then it should call usersService', () => {
+      it('then it should call userService', () => {
         expect(usersService.getUsers).toHaveBeenCalled();
       });
 
-      test('then it should return users', () => {
+      it('then it should return a user', () => {
         expect(users).toEqual([userStub()]);
       });
     });
   });
-
   describe('createUser', () => {
     describe('when createUser is called', () => {
       let user: User;
@@ -71,22 +73,22 @@ xdescribe('UsersController', () => {
           email: userStub().email,
           age: userStub().age,
         };
+
         user = await usersController.createUser(createUserDto);
       });
 
-      test('then it should call usersService', () => {
+      it('then it should call userService', () => {
         expect(usersService.createUser).toHaveBeenCalledWith(
           createUserDto.email,
           createUserDto.age,
         );
       });
 
-      test('then it should return a user', () => {
+      it('then it should return a user', () => {
         expect(user).toEqual(userStub());
       });
     });
   });
-
   describe('updateUser', () => {
     describe('when updateUser is called', () => {
       let user: User;
@@ -94,23 +96,24 @@ xdescribe('UsersController', () => {
 
       beforeEach(async () => {
         updateUserDto = {
-          age: 98,
-          favoriteFoods: ['pizza'],
+          favoriteFoods: ['Olive'],
+          age: 22,
         };
+
         user = await usersController.updateUser(
           userStub().userId,
           updateUserDto,
         );
       });
 
-      test('then it should call usersService', () => {
+      it('then it should call userService', () => {
         expect(usersService.updateUser).toHaveBeenCalledWith(
           userStub().userId,
           updateUserDto,
         );
       });
 
-      test('then it should return a user', () => {
+      it('then it should return a user', () => {
         expect(user).toEqual(userStub());
       });
     });
