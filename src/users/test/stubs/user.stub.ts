@@ -1,10 +1,10 @@
-import { User } from "../../schemas/user.schema";
+import { User } from 'src/users/schemas/user.schema';
 
 export const userStub = (): User => {
- return {
+  return {
     userId: '123',
-    email: 'test@example.com',
-    age: 23,
-    favoriteFoods:  ['apples', 'pizza']
-  }
-}
+    email: 'iromashko@me.com',
+    age: 24,
+    favoriteFoods: ['apples', 'pizza'],
+  };
+};

@@ -1,12 +1,12 @@
 import { getModelToken } from '@nestjs/mongoose';
 import { Test } from '@nestjs/testing';
 import { FilterQuery } from 'mongoose';
-import { User } from '../schemas/user.schema';
-import { userStub } from './stubs/user.stub';
-import { UsersRepository } from '../users.repository';
-import { UserModel } from './support/user.model';
+import { User } from './schemas/user.schema';
+import { userStub } from './test/stubs/user.stub';
+import { UserModel } from './test/support/user.model';
+import { UsersRepository } from './users.repository';
 
-xdescribe('UsersRepository', () => {
+describe(UsersRepository.name, () => {
   let usersRepository: UsersRepository;
 
   describe('find operations', () => {
@@ -43,19 +43,18 @@ xdescribe('UsersRepository', () => {
           user = await usersRepository.findOne(userFilterQuery);
         });
 
-        test('then it should call the userModel', () => {
+        it('then it should call the userModel', () => {
           expect(userModel.findOne).toHaveBeenCalledWith(userFilterQuery, {
             _id: 0,
             __v: 0,
           });
         });
 
-        test('then it should return a user', () => {
+        it('then it should return a user', () => {
           expect(user).toEqual(userStub());
         });
       });
     });
-
     describe('find', () => {
       describe('when find is called', () => {
         let users: User[];
@@ -65,16 +64,15 @@ xdescribe('UsersRepository', () => {
           users = await usersRepository.find(userFilterQuery);
         });
 
-        test('then it should call the userModel', () => {
+        it('then it should call the userModel', () => {
           expect(userModel.find).toHaveBeenCalledWith(userFilterQuery);
         });
 
-        test('then it should return a user', () => {
+        it('then it should return a users', () => {
           expect(users).toEqual([userStub()]);
         });
       });
     });
-
     describe('findOneAndUpdate', () => {
       describe('when findOneAndUpdate is called', () => {
         let user: User;
@@ -87,13 +85,13 @@ xdescribe('UsersRepository', () => {
           );
         });
 
-        test('then it should call the userModel', () => {
+        it('then it should call the userModel', () => {
           expect(
             userModel.findOneAndUpdate,
           ).toHaveBeenCalledWith(userFilterQuery, userStub(), { new: true });
         });
 
-        test('then it should return a user', () => {
+        it('then it should return a user', () => {
           expect(user).toEqual(userStub());
         });
       });
@@ -107,7 +105,7 @@ xdescribe('UsersRepository', () => {
           UsersRepository,
           {
             provide: getModelToken(User.name),
-            useValue: UserModel,
+            useClass: UserModel,
           },
         ],
       }).compile();
@@ -124,15 +122,16 @@ xdescribe('UsersRepository', () => {
         beforeEach(async () => {
           saveSpy = jest.spyOn(UserModel.prototype, 'save');
           constructorSpy = jest.spyOn(UserModel.prototype, 'constructorSpy');
+
           user = await usersRepository.create(userStub());
         });
 
-        test('then it should call the userModel', () => {
+        it('then it should call the userModel', () => {
           expect(saveSpy).toHaveBeenCalled();
           expect(constructorSpy).toHaveBeenCalledWith(userStub());
         });
 
-        test('then it should return a user', () => {
+        it('then it should return a user', () => {
           expect(user).toEqual(userStub());
         });
       });
